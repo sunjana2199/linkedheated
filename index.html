@@ -485,9 +485,16 @@ function parseXLSX(buf, filename) {
   DATA_TYPE = 'xlsx';
 
   // Extract name from filename: "AggregateAnalytics_First Last_2025-..."
-  let name = 'Your LinkedIn';
+  let name = '';
   const nm = filename.match(/AggregateAnalytics[_\s]+(.+?)[_\s]+\d{4}/i);
   if (nm) name = nm[1].trim();
+
+  // Fallback: extract from post URLs (e.g. linkedin.com/posts/first-last_...)
+  if (!name && topByEng.length) {
+    const slug = topByEng[0][0].match(/linkedin\.com\/posts\/([^_/]+)/);
+    if (slug) name = slug[1].split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+  if (!name) name = 'Your LinkedIn';
 
   TOP_ENG = topByEng.slice(0,5);
   TOP_IMP = topByImp.slice(0,5);
