@@ -1,0 +1,12 @@
+boto3
+awscli
+langchain
+langchain-community
+streamlit
+pypdf
+torch
+accelerate
+bitsandbytes
+transformers
+sentence_transformers
+faiss_cpu

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      width: 320px;
+      background: #f3f2ef;
+      color: #191919;
+    }
+
+    .header {
+      background: #0a66c2;
+      color: white;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header svg { flex-shrink: 0; }
+
+    .header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .body { padding: 16px; }
+
+    .description {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: #0a66c2;
+      color: white;
+    }
+    .btn-primary:hover { background: #004182; }
+    .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
+
+    .btn-success {
+      background: #057642;
+      color: white;
+      margin-top: 10px;
+      display: none;
+    }
+    .btn-success:hover { background: #046236; }
+
+    .status-box {
+      margin-top: 14px;
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      display: none;
+    }
+
+    .status-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .progress-bar-wrap {
+      background: #e0e0e0;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #0a66c2;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: #333;
+    }
+
+    .latest-post {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #888;
+      word-break: break-all;
+    }
+
+    .done-msg {
+      font-size: 13px;
+      color: #057642;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .error-msg {
+      font-size: 13px;
+      color: #b00;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM9 17H6.5v-7H9v7zm-1.25-8.27a1.37 1.37 0 110-2.74 1.37 1.37 0 010 2.74zM18 17h-2.5v-3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V17H10v-7h2.5v1.1A3.48 3.48 0 0115 9.5c1.93 0 3 1.57 3 3.5V17z"/>
+    </svg>
+    <h1>LinkedIn Post Scraper</h1>
+  </div>
+
+  <div class="body">
+    <p class="description">
+      Scrapes your posts from the past 365 days — including impressions, likes, comments, date, and link.
+    </p>
+
+    <button class="btn btn-primary" id="startBtn">Start Scraping</button>
+    <button class="btn btn-success" id="downloadBtn">⬇ Download CSV</button>
+
+    <div class="status-box" id="statusBox">
+      <div class="status-label">Status</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="status-text" id="statusText">Initializing...</div>
+      <div class="latest-post" id="latestPost"></div>
+      <div class="done-msg" id="doneMsg" style="display:none"></div>
+      <div class="error-msg" id="errorMsg" style="display:none"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
