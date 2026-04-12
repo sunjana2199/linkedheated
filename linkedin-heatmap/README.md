@@ -1,2 +1,0 @@
-# linkedheated
-LinkedIn stats heatmap
