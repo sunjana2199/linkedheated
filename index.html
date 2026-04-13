@@ -182,6 +182,27 @@
   .sc-rate  { font-size:11px; color:var(--muted); }
   .sc-blue{color:var(--blue);} .sc-green{color:var(--green);} .sc-orange{color:var(--orange);}
 
+  /* ── Follower Calculator ── */
+  .calc-section { border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:24px; background:var(--surface); }
+  .calc-title { font-size:15px; font-weight:700; margin-bottom:4px; }
+  .calc-subtitle { font-size:12px; color:var(--muted); margin-bottom:20px; }
+  .calc-stats { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
+  .calc-stat { background:var(--bg); border:1px solid var(--border2); border-radius:8px; padding:12px 16px; flex:1; min-width:130px; }
+  .calc-stat-val { font-size:22px; font-weight:700; color:var(--text); line-height:1.2; }
+  .calc-stat-lbl { font-size:11px; color:var(--muted); margin-top:3px; }
+  .calc-input-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .calc-input-row label { font-size:13px; color:var(--muted); white-space:nowrap; }
+  .calc-input { background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text);
+    font-size:15px; font-weight:600; padding:7px 12px; width:90px; outline:none; text-align:center; }
+  .calc-input:focus { border-color:var(--blue); }
+  .calc-result { background:var(--bg); border:1px solid var(--border2); border-radius:8px; padding:14px 18px; display:flex; flex-wrap:wrap; gap:20px; }
+  .calc-res-item { flex:1; min-width:140px; }
+  .calc-res-val { font-size:20px; font-weight:700; }
+  .calc-res-lbl { font-size:11px; color:var(--muted); margin-top:2px; }
+  .calc-on-track { font-size:12px; margin-top:12px; padding:8px 12px; border-radius:6px; }
+  .on-track-yes { background:rgba(63,185,80,.1); color:var(--green); border:1px solid rgba(63,185,80,.25); }
+  .on-track-no  { background:rgba(247,129,102,.1); color:var(--orange); border:1px solid rgba(247,129,102,.25); }
+
   /* ── Top posts ── */
   .posts-list { display:flex; flex-direction:column; gap:8px; }
   .post-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border2); }
@@ -280,6 +301,45 @@
     </div>
     <canvas id="projCanvas" height="220"></canvas>
     <div class="scenarios" id="scenarios"></div>
+  </div>
+
+  <div class="calc-section" id="calcSection" style="display:none">
+    <div class="calc-title">100K Follower Calculator</div>
+    <div class="calc-subtitle">Based on your current growth rate</div>
+    <div class="calc-stats">
+      <div class="calc-stat">
+        <div class="calc-stat-val" id="calcCurFollowers">—</div>
+        <div class="calc-stat-lbl">Current followers</div>
+      </div>
+      <div class="calc-stat">
+        <div class="calc-stat-val" id="calcPerMonth">—</div>
+        <div class="calc-stat-lbl">Your avg followers / month</div>
+      </div>
+      <div class="calc-stat">
+        <div class="calc-stat-val" id="calcToGo">—</div>
+        <div class="calc-stat-lbl">Followers to reach 100K</div>
+      </div>
+    </div>
+    <div class="calc-input-row">
+      <label>I want to reach 100K in</label>
+      <input class="calc-input" type="number" id="calcMonths" value="12" min="1" max="120" oninput="updateCalc()" />
+      <label>months — I need</label>
+    </div>
+    <div class="calc-result">
+      <div class="calc-res-item">
+        <div class="calc-res-val" id="calcNeeded" style="color:var(--blue)">—</div>
+        <div class="calc-res-lbl">followers / month needed</div>
+      </div>
+      <div class="calc-res-item">
+        <div class="calc-res-val" id="calcNeededDay" style="color:var(--purple)">—</div>
+        <div class="calc-res-lbl">followers / day needed</div>
+      </div>
+      <div class="calc-res-item">
+        <div class="calc-res-val" id="calcTargetDate" style="color:var(--muted)">—</div>
+        <div class="calc-res-lbl">target date</div>
+      </div>
+    </div>
+    <div class="calc-on-track" id="calcOnTrack"></div>
   </div>
 
   <div class="two-col">
@@ -570,7 +630,54 @@ function buildXLSXDashboard(posts, name, currentFollowers) {
 
   buildHmToggle();
   buildBarToggle();
+  buildCalc(currentFollowers, posts);
   showDashboard();
+}
+
+/* ── Follower Calculator ─────────────────────────────── */
+let CALC_CURRENT = 0, CALC_AVG_MONTHLY = 0;
+
+function buildCalc(currentFollowers, posts) {
+  if (!posts || !posts.length) return;
+  CALC_CURRENT = currentFollowers;
+
+  // Avg new followers per month from data
+  const days = posts.length;
+  const totalNewFol = posts.reduce((s,p) => s + p.followers, 0);
+  CALC_AVG_MONTHLY = Math.round((totalNewFol / days) * 30.4);
+
+  document.getElementById('calcCurFollowers').textContent = currentFollowers.toLocaleString();
+  document.getElementById('calcPerMonth').textContent     = CALC_AVG_MONTHLY.toLocaleString();
+  document.getElementById('calcToGo').textContent         = Math.max(0, 100000 - currentFollowers).toLocaleString();
+  document.getElementById('calcSection').style.display   = 'block';
+  updateCalc();
+}
+
+function updateCalc() {
+  const months   = Math.max(1, parseInt(document.getElementById('calcMonths').value) || 12);
+  const toGo     = Math.max(0, 100000 - CALC_CURRENT);
+  const needed   = Math.ceil(toGo / months);
+  const neededDay = Math.ceil(needed / 30.4);
+  const targetDate = new Date(); targetDate.setMonth(targetDate.getMonth() + months);
+  const dateFmt  = targetDate.toLocaleDateString('en-US', {month:'short', year:'numeric'});
+
+  document.getElementById('calcNeeded').textContent    = needed.toLocaleString();
+  document.getElementById('calcNeededDay').textContent = neededDay.toLocaleString();
+  document.getElementById('calcTargetDate').textContent = dateFmt;
+
+  const onTrack = document.getElementById('calcOnTrack');
+  if (toGo <= 0) {
+    onTrack.textContent = 'You already have 100K followers!';
+    onTrack.className = 'calc-on-track on-track-yes';
+  } else if (CALC_AVG_MONTHLY >= needed) {
+    const surplus = CALC_AVG_MONTHLY - needed;
+    onTrack.textContent = `You are on track — your current rate exceeds the target by ${surplus.toLocaleString()} followers/month.`;
+    onTrack.className = 'calc-on-track on-track-yes';
+  } else {
+    const gap = needed - CALC_AVG_MONTHLY;
+    onTrack.textContent = `You need ${gap.toLocaleString()} more followers/month than your current average to hit this target.`;
+    onTrack.className = 'calc-on-track on-track-no';
+  }
 }
 
 /* ── CSV parser ──────────────────────────────────────── */
